@@ -58,6 +58,7 @@ def train_model(input_to_softmax,
     validation_steps = num_valid_samples//minibatch_size
     
     # add CTC loss to the NN specified in input_to_softmax
+    print(input_to_softmax)
     model = add_ctc_loss(input_to_softmax)
 
     # CTC loss is implemented elsewhere, so use a dummy lambda function for the loss

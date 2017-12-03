@@ -1,0 +1,30 @@
+model 0 is a simple RNN network with 16,617 Trainable params.
+
+model 1 is a simple RNN followed by a Dense layer, which should help to find and use more complex
+pattern in the dataset (Trainable params: 223,429).
+
+As expected, model_1 performs better than model_0.
+
+model_2 add an additional level of complexity (CNN -> RNN -> Dense layer) by introduccing a 1d convolution layer.
+The number of trainable parameters for model_2 is 441,229.
+
+
+As expected model_2 performs better than model_0 and model_1. Moreover model_2 is the
+best network on a training with 20 epochs.
+We should also note that this model is fast to converge (i.e results after only few epochs are quite good).
+Moreover the training time is more than 2 times faster than other models (22 sec per epoch on my computer).
+
+model_3 (deep_rnn_model) use multiple recurrent layer (2 in our training) before a dense layer (Trainable params: 464,429
+). As expected model_3 performs better than model_1 and model_0 (the loss on epoch 20 is lower than the loss for model_0 and model_1).
+
+But if we compare the model_2 and model_3, the CNN approach provide better results with less trainable parameters.
+But we should note that the validation loss is close (137.01 vs 144.91).
+
+It terms of time performance, the model_3 is slower to train (20sec vs 55sec per epoch).
+
+
+Model_4 introduce a bidirectional architecture followed by a Dense layer, with 446,029 Trainable parameters.
+As expected it performs better than model_0. But not better than model_1.
+We could also see that this model learns slowly (the decrease in the loss between epoch 5 and epoch 20 is really slow.
+
+
