@@ -168,44 +168,25 @@ class MyLayerExpandDim(Layer):
         return (input_shape[0], input_shape[1], input_shape[2], 1)
     
     
-def final_model(input_dim, filters=40, kernel_size=5, units=200, output_dim=29, recur_layers=3,
+def final_model(input_dim, filters=50, kernel_size=5, units=200, output_dim=29, recur_layers=3,
                 activation='relu', dropout_rate=0.1):
     """ Build a deep network for speech
     """
     conv_stride=1
-    conv_border_mode='valid'
+    conv_border_mode='same'
     # Main acoustic input
     # we add a dimension, to be able to apply convolution1d to frequencies only
     input_data = Input(name='the_input', shape=(None, input_dim))
-    
-    x = MyLayerExpandDim()(input_data)
-    
-    
     # applying convolution to frequency domain -> allowing to model spectral variance due to speaker change (better than fullly connected because it preserve orders of frequencies)
-    conv_0 = Conv2D(filters, kernel_size, strides=[1, 1], padding=conv_border_mode, activation='relu')(x)
+    
+    conv_0 = Conv1D(filters, 1, strides=1, padding=conv_border_mode, activation='relu')(input_data)
     conv_0 = BatchNormalization()(conv_0)
-    conv_1 = Conv2D(filters, kernel_size, strides=[1, 4], padding=conv_border_mode, activation='relu')(conv_0)
+    conv_1 = Conv1D(filters, 3, strides=1, padding=conv_border_mode, activation='relu')(conv_0)
     conv_1 = BatchNormalization()(conv_1)
-    conv_2 = Conv2D(filters, kernel_size, strides=[1, 4], padding=conv_border_mode, activation='relu')(conv_1)
+    conv_2 = Conv1D(filters, 1, strides=1, padding=conv_border_mode, activation='relu')(conv_1)
     conv_2 = BatchNormalization()(conv_2)
     
-    #after_conv = K.reshape(conv_2, (-1, -1,  conv_2.shape[-1].value * conv_2.shape[-2].value))  # reshaping.. so we have [batch_size, time, features]
-    #after_conv = (tensor=after_conv)
-    after_conv = MyLayerReshape()(conv_2)
-
-    
-    # fully connected layers that allowed to extract on each timestep complex frequency features
-    #fc0 = Dense(filters, activation=activation)(input_data)
-    #fc0 = BatchNormalization()(fc0)
-    
-    #fc1 = Dense(filters//2, activation=activation)(fc0)
-    #fc1 = BatchNormalization()(fc1)
-    
-    #fc2 = Dense(filters//4, activation=activation)(fc1)
-    #fc2 = BatchNormalization()(fc2)
-    
-    # TODO: stack conv1d_0, 1, et 2 pour en faire l'entree du rnn
-    rnn_input = after_conv
+    rnn_input = conv_2
     #units = filters//4
     #rnn_input = input_data
     for num in range(recur_layers):
